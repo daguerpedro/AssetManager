@@ -1,4 +1,8 @@
 #include "Engine.h"
+#include "GUI/EditorContainer.h"
+#include "GUI/GameContainer.h"
+
+Engine* Engine::_engine = nullptr;
 
 Engine::Engine()
 {
@@ -9,8 +13,22 @@ Engine::~Engine()
 {
 }
 
+Engine* Engine::GetInstance()
+{
+    if (_engine == nullptr) {
+        _engine = new Engine();
+    }
+    return _engine;
+}
+
 void Engine::init(ImVec2 winsize, const std::string& title)
 {
+#ifdef _DEBUG
+    guiHandler.pushContainer(std::make_shared<EditorContainer>());
+    guiHandler.pushContainer(std::make_shared<GameContainer>());
+#endif
+    //TODO: IF ITS NOT DEBUG, JUST RENDER INSIDE THE SFML WINDOW!
+
     window.create(sf::VideoMode(winsize.x, winsize.y), title);
     ImGui::SFML::Init(window);
 

@@ -2,6 +2,7 @@
 #include "Container.h"
 #include <memory>
 #include <vector>
+#include <SFML/Graphics.hpp>
 
 class GuiHandler
 {

@@ -1,7 +1,7 @@
 #pragma once
-#include "..\Engine\Container.h"
+#include "..\Container.h"
 
-#include "..\Config.h"
+#include "Config.h"
 
 class EditorContainer : public Container {
 

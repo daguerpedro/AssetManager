@@ -7,15 +7,22 @@
 
 class Engine
 {
-	sf::RenderWindow window;
+protected:
 	ImGuiIO* io;
-
-	   
-public:
-	GuiHandler guiHandler;
 
 	Engine();
 	 ~Engine();
+
+	 static Engine* _engine;
+	  
+public:
+	Engine(Engine& other) = delete;
+	void operator=(const Engine&) = delete;
+
+	static Engine* GetInstance();
+
+	GuiHandler guiHandler;
+	sf::RenderWindow window;
 
     void init(ImVec2 winsize, const std::string& title);
 };
