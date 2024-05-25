@@ -1,0 +1,8 @@
+lib/
+.vs/
+out/
+*.filters
+*.user
+*.vcxproj
+*.vcxproj.user
+objetivo.txt
