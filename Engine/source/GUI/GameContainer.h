@@ -1,6 +1,8 @@
 #pragma once
-#include "..\Container.h"
+#include "..\Generic\Container.h"
 #include "Config.h"
+
+#include <Engine.h>
 
 class GameContainer : public Container {
 public:
@@ -11,10 +13,9 @@ public:
 	{
 		rt.create(0, 0);
 	}
-	void onUpdate() override
+	void onUpdate(const int& dt) override
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
-		ImGui::SetNextWindowPos({ 0,0 });
 
 		ImGui::Begin("Game view", nullptr);
 			
@@ -32,19 +33,7 @@ public:
 				static_cast<uint8_t>(Config::color_bg[3] * 255)
 			});
 			
-			//TODO: Render Entity from entity manager
-			sf::CircleShape shape{Config::f_size, (size_t)Config::i_sides};
-
-			shape.setFillColor({
-				static_cast<uint8_t>(Config::color_circle[0] * 255),
-				static_cast<uint8_t>(Config::color_circle[1] * 255),
-				static_cast<uint8_t>(Config::color_circle[2] * 255),
-				static_cast<uint8_t>(Config::color_circle[3] * 255)
-				});
-
-			shape.setOrigin(shape.getLocalBounds().width / 2, shape.getLocalBounds().height / 2 );
-			shape.setPosition(rt.getView().getCenter());
-			rt.draw(shape);
+			Engine::GetInstance()->entityHandler.updateEntities(dt);
 
 			ImGui::Image(rt);
 		ImGui::End();

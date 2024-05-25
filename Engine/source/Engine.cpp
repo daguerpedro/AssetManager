@@ -6,12 +6,14 @@ Engine* Engine::_engine = nullptr;
 
 Engine::Engine()
 {
-    guiHandler = GuiHandler();
+    io = nullptr;
 }
 
 Engine::~Engine()
 {
 }
+
+Engine::Console Engine::console;
 
 Engine* Engine::GetInstance()
 {
@@ -25,7 +27,9 @@ void Engine::init(ImVec2 winsize, const std::string& title)
 {
 #ifdef _DEBUG
     guiHandler.pushContainer(std::make_shared<EditorContainer>());
-    guiHandler.pushContainer(std::make_shared<GameContainer>());
+    
+    auto g = std::make_shared<GameContainer>();
+    guiHandler.pushContainer(g);
 #endif
     //TODO: IF ITS NOT DEBUG, JUST RENDER INSIDE THE SFML WINDOW!
 
@@ -35,7 +39,16 @@ void Engine::init(ImVec2 winsize, const std::string& title)
     io = &ImGui::GetIO();
     io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-    sf::Clock dt;
+    sf::Clock c_sfml;
+    sf::Clock c_time;
+
+#ifdef _DEBUG
+    rtarget = &g->rt;
+#endif
+#ifdef _NDEBUG
+    rtarget = &window;
+#endif
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -46,12 +59,29 @@ void Engine::init(ImVec2 winsize, const std::string& title)
                 window.close();
         }
 
-        ImGui::SFML::Update(window, dt.restart());
-        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()->ID);
+        const int dt = c_time.restart().asMilliseconds();
+
+        ImGui::SFML::Update(window, c_sfml.restart());
+        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()->ID, 0, ImGuiDockNodeFlags_PassthruCentralNode);
         
         window.clear();
 
-        guiHandler.updateGuis();
+        if (rtarget != nullptr)
+        {
+            rtarget->clear({
+                static_cast<uint8_t>(Config::color_bg[0] * 255),
+                static_cast<uint8_t>(Config::color_bg[1] * 255),
+                static_cast<uint8_t>(Config::color_bg[2] * 255),
+                static_cast<uint8_t>(Config::color_bg[3] * 255)
+             });
+        }
+
+        guiHandler.updateGuis(dt);
+        entityHandler.updateEntities(dt);
+
+#ifdef _DEBUG
+        console.draw();
+#endif // _DEBUG
 
         ImGui::SFML::Render(window);
         window.display();

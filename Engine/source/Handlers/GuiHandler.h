@@ -1,5 +1,5 @@
 #pragma once
-#include "Container.h"
+#include "../Generic/Container.h"
 #include <memory>
 #include <vector>
 #include <SFML/Graphics.hpp>
@@ -11,7 +11,7 @@ public:
 	~GuiHandler();
 
 	void pushContainer(const std::shared_ptr<Container>& container);
-	void updateGuis();
+	void updateGuis(const int& dt);
 private:
 	std::vector<std::shared_ptr<Container>> containers;
 
