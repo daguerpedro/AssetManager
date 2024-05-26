@@ -1,6 +1,6 @@
-A concept of a game engine, aiming to develop modern C++ skills.  
-There is no WIP.  
-
+> [!There is no WIP]  
+> A concept of a game engine, aiming to develop modern C++ skills.    
+  
 Libraries used:
 - SFML
 - ImGui

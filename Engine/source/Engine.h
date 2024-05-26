@@ -1,10 +1,12 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+
 #include "./Handlers/GuiHandler.h"
+#include "./Handlers/EntityHandler.h"
+#include "./Console.h"
 
 #include "imgui.h"
 #include "imgui-SFML.h"
-#include <Handlers/EntityHandler.h>
 
 class Engine
 {
@@ -14,49 +16,25 @@ protected:
 	Engine();
 	 ~Engine();
 
-	static Engine* _engine;
-	
-	struct Console {
-		std::vector<std::string> messages;
-
-		void log(const std::string& m)
-		{
-			messages.push_back(m);
-		}
-
-		void clear()
-		{
-			messages.clear();
-		}
-
-		void draw()
-		{
-			ImGui::Begin("LOG");
-			if (ImGui::SmallButton("Clear")) clear();
-
-			if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, -(ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing())), ImGuiChildFlags_None, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NavFlattened))
-			{
-				for (auto s : messages)
-					ImGui::TextUnformatted(s.c_str());
-			}
-			ImGui::EndChild();
-			ImGui::End();
-		}
-	};
+	static Engine* _engine; // Singleton
 	
 	sf::RenderWindow window;
 public:
-	sf::RenderTarget* rtarget;
+	/// Its a primitive struct.
+	/// Can be pointed as a window or a RenderTexture
+	/// Window when its a release, RenderTexture when its a debug/editor.
+	sf::RenderTarget* rtarget; 
 
-	Engine(Engine& other) = delete;
+	Engine(Engine& other) = delete; 
 	void operator=(const Engine&) = delete;
 
-	static Engine* GetInstance();
+	static Engine* GetInstance();  // Singleton access
 	static Console console;
 
     void init(ImVec2 winsize, const std::string& title);
 
-	EntityHandler entityHandler;
+	// Instance of the handlers.
+	EntityHandler entityHandler; 
 	GuiHandler guiHandler;
 
 };

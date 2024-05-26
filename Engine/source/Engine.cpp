@@ -28,11 +28,11 @@ void Engine::init(ImVec2 winsize, const std::string& title)
 #ifdef _DEBUG
     guiHandler.pushContainer(std::make_shared<EditorContainer>());
     
-    auto g = std::make_shared<GameContainer>();
+    /// When using a debug version, it wont draw things on the render window, but to a RenderTexture.
+    /// So the RenderTexture can act like a viewport.
+    auto g = std::make_shared<GameContainer>(); // Game container is just a ImGui window that draw a RenderTexture.
     guiHandler.pushContainer(g);
 #endif
-    //TODO: IF ITS NOT DEBUG, JUST RENDER INSIDE THE SFML WINDOW!
-
     window.create(sf::VideoMode(winsize.x, winsize.y), title);
     ImGui::SFML::Init(window);
 
@@ -43,10 +43,10 @@ void Engine::init(ImVec2 winsize, const std::string& title)
     sf::Clock c_time;
 
 #ifdef _DEBUG
-    rtarget = &g->rt;
+    rtarget = &g->rt; //If using a debug version, the render target will be a ImGui Window.
 #endif
 #ifdef _NDEBUG
-    rtarget = &window;
+    rtarget = &window; //If not a debug version, just use the RenderWindow.
 #endif
 
     while (window.isOpen())
@@ -68,6 +68,8 @@ void Engine::init(ImVec2 winsize, const std::string& title)
 
         if (rtarget != nullptr)
         {
+            //TODO: Make a color conversion function.
+            //Clear the render using a color setted via Config.
             rtarget->clear({
                 static_cast<uint8_t>(Config::color_bg[0] * 255),
                 static_cast<uint8_t>(Config::color_bg[1] * 255),
@@ -76,6 +78,7 @@ void Engine::init(ImVec2 winsize, const std::string& title)
              });
         }
 
+        //tick
         guiHandler.updateGuis(dt);
         entityHandler.updateEntities(dt);
 
