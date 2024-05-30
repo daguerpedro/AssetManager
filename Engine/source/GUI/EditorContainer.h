@@ -3,42 +3,20 @@
 
 #include "Config.h"
 #include <Engine.h>
-#include <Entities/Test.h>
+#include <Entities/Circle.h>
 
 class EditorContainer : public Container 
 {
-	float c[4]{ 0,0,1,1 };
-	
-	int sides = 3;
-	int radius = 25;
+	float col[4] = { 1, 0, 0, 1 };
+	float rad = 5;
+	int sid = 5;
 
 	void onUpdate(const int& dt) override
 	{		
-			ImGui::Begin("Settings", nullptr);
-			ImGui::ColorEdit4("Background", Config::color_bg, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_NoInputs);
-			ImGui::Separator();
-
-            if (ImGui::TreeNode("Entity List"))
-            {
-				int i = 0;
-
-				for (auto e : Engine::GetInstance()->entityHandler.entities)
-				{
-					i++;
-
-					if (ImGui::Button(("Delete##" + std::to_string(i)).c_str()))
-					{
-						Engine::GetInstance()->entityHandler.remove(e);
-					}
-
-	                ImGui::Separator();
-				}
-
-                ImGui::TreePop();
-            } 
+		ImGui::Begin("Settings", nullptr);
 			if (ImGui::TreeNode("Entity Creator"))
 			{
-				const char* items[] = { "Test" };
+				const char* items[] = { "Circulo" };
 				static int item_current_idx = 0;
 
 				const char* combo_preview_value = items[item_current_idx];
@@ -50,42 +28,80 @@ class EditorContainer : public Container
 						const bool is_selected = (item_current_idx == n);
 						if (ImGui::Selectable(items[n], is_selected))
 							item_current_idx = n;
-												
+
 						if (is_selected)
 							ImGui::SetItemDefaultFocus();
 					}
 					ImGui::EndCombo();
 				}
 
-				ImGui::ColorEdit4("Color", c);
-				ImGui::InputInt("Sides", &sides, 1, 1);
-				ImGui::InputInt("Radius", &radius, 1, 1);
+				ImGui::ColorEdit4("Color", col);
+				ImGui::InputInt("Sides", &sid, 1, 1);
+				ImGui::InputFloat("Radius", &rad, 1, 1);
 
-				if (sides <= 2) sides = 3;
-
+				if (sid <= 2) sid = 3;
 
 				if (ImGui::Button("Create"))
 				{
-					Engine::GetInstance()->entityHandler.pushEntity(std::make_shared<Test>(1, sf::Color{
-						static_cast<sf::Uint8>(c[0] * 255),
-						static_cast<sf::Uint8>(c[1] * 255),
-						static_cast<sf::Uint8>(c[2] * 255),
-						static_cast<sf::Uint8>(c[3] * 255)
-						}, radius, sides));
+					Engine::GetInstance()->entityHandler.pushEntity(std::make_shared<Circle>(1, col, rad, sid));
 
 					std::string text = "Criado entity do tipo ";
 					text += items[item_current_idx];
-					text += " Raio: ";
-					text += std::to_string(radius);
 
 					Engine::console.log(text);
 				}
 				ImGui::TreePop();
 			}
 
+			ImGui::ColorEdit4("Background", Config::color_bg, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_NoInputs);
+		ImGui::End();
 
-			ImGui::ShowDemoWindow();
+		ImGui::Begin("Entites");
+			if (ImGui::TreeNode("Entity List"))
+			{
+				int i = 0;
 
+				for (auto e : Engine::GetInstance()->entityHandler.entities)
+				{
+					i++;
+
+					ImGui::SeparatorText("Orientation");
+
+					ImGui::Text("Position"); ImGui::SameLine();
+					ImGui::InputFloat2(("##P" + std::to_string(i)).c_str(), e->position, "%.f");
+
+					ImGui::Text("Rotation"); ImGui::SameLine();
+					ImGui::InputFloat(("##Rt" + std::to_string(i)).c_str(), &e->rotation);
+
+					ImGui::Text("Scale"); ImGui::SameLine();
+					ImGui::InputFloat2(("##S" + std::to_string(i)).c_str(), e->scale);
+
+					ImGui::SeparatorText("Visual");
+
+					ImGui::Text("Layer: %i", e->getLayer());
+					ImGui::InputInt(("##L" + std::to_string(i)).c_str(), &e->Layer);
+
+					if (std::shared_ptr<Circle> circle = dynamic_pointer_cast<Circle>(e))
+					{
+						ImGui::Text("Radius"); ImGui::SameLine();
+						ImGui::InputFloat(("##Rd" + std::to_string(i)).c_str(), &circle->radius);
+
+						ImGui::Text("Color"); ImGui::SameLine();
+						ImGui::ColorEdit4(("##Clr" + std::to_string(i)).c_str(), circle->color);
+					}
+
+					ImGui::SeparatorText("Other");
+
+					if (ImGui::Button(("Delete##" + std::to_string(i)).c_str()))
+					{
+						Engine::GetInstance()->entityHandler.remove(e);
+					}
+
+					ImGui::Separator();
+				}
+
+				ImGui::TreePop();
+			}
 		ImGui::End();
 	}
 };

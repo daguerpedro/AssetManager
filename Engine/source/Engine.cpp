@@ -13,7 +13,7 @@ Engine::~Engine()
 {
 }
 
-Engine::Console Engine::console;
+Console Engine::console{};
 
 Engine* Engine::GetInstance()
 {
@@ -70,15 +70,11 @@ void Engine::init(ImVec2 winsize, const std::string& title)
         {
             //TODO: Make a color conversion function.
             //Clear the render using a color setted via Config.
-            rtarget->clear({
-                static_cast<uint8_t>(Config::color_bg[0] * 255),
-                static_cast<uint8_t>(Config::color_bg[1] * 255),
-                static_cast<uint8_t>(Config::color_bg[2] * 255),
-                static_cast<uint8_t>(Config::color_bg[3] * 255)
-             });
+            rtarget->clear(Conversion::floatToColor(Config::color_bg));
         }
 
         //tick
+        entityHandler.preUpdate();
         guiHandler.updateGuis(dt);
         entityHandler.updateEntities(dt);
 

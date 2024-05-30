@@ -3,7 +3,9 @@
 
 #include "./Handlers/GuiHandler.h"
 #include "./Handlers/EntityHandler.h"
-#include "./Console.h"
+#include "./Utils/Conversion.h"
+#include "./Utils/Console.h"
+
 
 #include "imgui.h"
 #include "imgui-SFML.h"

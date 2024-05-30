@@ -2,12 +2,20 @@
 #include <algorithm>
 #include <Engine.h>
 
+void EntityHandler::preUpdate()
+{
+	for (auto& entity : entities)
+		if (entity->enabled)
+			entity->preUpdate();
+}
 void EntityHandler::updateEntities(const int& dt)
 {
 	for (auto& entity : entities)
 		if (entity->enabled)
 		{
 			entity->OnUpdate(dt);
+			entity->postUpdate();
+
 			Engine::GetInstance()->rtarget->draw(*entity->drawAble);
 		}
 }
