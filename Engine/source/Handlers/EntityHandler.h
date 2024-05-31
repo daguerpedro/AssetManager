@@ -11,8 +11,9 @@ public:
 	void sort(); //Organize entities by layer.
 	
 	void preUpdate();
-	void updateEntities(const int& dt); //Tick
-	
+	void updateEntities(const float& dt); //Tick
+	void postUpdate();
+
 	void pushEntity(const std::shared_ptr<Entity>& entity);
 	void remove(std::shared_ptr<Entity> e);
 };

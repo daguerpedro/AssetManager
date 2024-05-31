@@ -4,7 +4,9 @@
 void Entity::setLayer(const unsigned int& layer)
 {
 	_layer = layer;
-	Engine::GetInstance()->entityHandler.sort();
+	//TODO: SORT SCENE.
+	Engine::console.log("[ENTITY.CPP LINE 8] TODO: SORT SCENE ENTITES.");
+	Engine::GetInstance()->globalEntityHandler.sort();
 }
 
 unsigned int& Entity::getLayer()

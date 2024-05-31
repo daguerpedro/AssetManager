@@ -8,14 +8,19 @@ void EntityHandler::preUpdate()
 		if (entity->enabled)
 			entity->preUpdate();
 }
-void EntityHandler::updateEntities(const int& dt)
+void EntityHandler::updateEntities(const float& dt)
+{
+	for (auto& entity : entities)
+		if (entity->enabled)
+			entity->OnUpdate(dt);
+}
+
+void EntityHandler::postUpdate()
 {
 	for (auto& entity : entities)
 		if (entity->enabled)
 		{
-			entity->OnUpdate(dt);
 			entity->postUpdate();
-
 			Engine::GetInstance()->rtarget->draw(*entity->drawAble);
 		}
 }

@@ -59,7 +59,7 @@ void Engine::init(ImVec2 winsize, const std::string& title)
                 window.close();
         }
 
-        const int dt = c_time.restart().asMilliseconds();
+        const float dt = c_time.restart().asSeconds();
 
         ImGui::SFML::Update(window, c_sfml.restart());
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()->ID, 0, ImGuiDockNodeFlags_PassthruCentralNode);
@@ -74,9 +74,16 @@ void Engine::init(ImVec2 winsize, const std::string& title)
         }
 
         //tick
-        entityHandler.preUpdate();
+
+        globalEntityHandler.preUpdate();
+        sceneHandler.preUpdateScene();
+
         guiHandler.updateGuis(dt);
-        entityHandler.updateEntities(dt);
+        globalEntityHandler.updateEntities(dt);
+        sceneHandler.updateScene(dt);
+
+        globalEntityHandler.postUpdate();
+        sceneHandler.postUpdateScene();
 
 #ifdef _DEBUG
         console.draw();
@@ -84,6 +91,14 @@ void Engine::init(ImVec2 winsize, const std::string& title)
 
         ImGui::SFML::Render(window);
         window.display();
+
+        if (!_started)
+        {
+            if (onStarted)
+                onStarted();
+            
+            _started = true;
+        }
     }
 
     ImGui::SFML::Shutdown();

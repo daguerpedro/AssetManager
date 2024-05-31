@@ -43,7 +43,7 @@ class EditorContainer : public Container
 
 				if (ImGui::Button("Create"))
 				{
-					Engine::GetInstance()->entityHandler.pushEntity(std::make_shared<Circle>(1, col, rad, sid));
+					Engine::GetInstance()->globalEntityHandler.pushEntity(std::make_shared<Circle>(1, col, rad, sid));
 
 					std::string text = "Criado entity do tipo ";
 					text += items[item_current_idx];
@@ -59,9 +59,10 @@ class EditorContainer : public Container
 		ImGui::Begin("Entites");
 			if (ImGui::TreeNode("Entity List"))
 			{
+				Engine::console.log("[EDITORCONTAINER.H LINE 60] TODO: LIST SCENE ENTITES AND SCENE LIST.");
 				int i = 0;
 
-				for (auto e : Engine::GetInstance()->entityHandler.entities)
+				for (auto e : Engine::GetInstance()->globalEntityHandler.entities)
 				{
 					i++;
 
@@ -94,7 +95,7 @@ class EditorContainer : public Container
 
 					if (ImGui::Button(("Delete##" + std::to_string(i)).c_str()))
 					{
-						Engine::GetInstance()->entityHandler.remove(e);
+						Engine::GetInstance()->globalEntityHandler.remove(e);
 					}
 
 					ImGui::Separator();

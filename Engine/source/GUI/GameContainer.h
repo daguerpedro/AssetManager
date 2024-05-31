@@ -28,7 +28,7 @@ public:
 
 			rt.clear(Conversion::floatToColor(Config::color_bg));
 			
-			Engine::GetInstance()->entityHandler.updateEntities(dt);
+			Engine::GetInstance()->globalEntityHandler.updateEntities(dt);
 
 			ImGui::Image(rt);
 		ImGui::End();

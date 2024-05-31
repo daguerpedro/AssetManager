@@ -11,7 +11,7 @@ public:
 	~GuiHandler();
 
 	void pushContainer(const std::shared_ptr<Container>& container);
-	void updateGuis(const int& dt); //Tick
+	void updateGuis(const float& dt); //Tick
 private:
 	std::vector<std::shared_ptr<Container>> containers;
 

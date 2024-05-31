@@ -1,8 +1,10 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <functional>
 
 #include "./Handlers/GuiHandler.h"
 #include "./Handlers/EntityHandler.h"
+#include "./Handlers/SceneHandler.h"
 #include "./Utils/Conversion.h"
 #include "./Utils/Console.h"
 
@@ -12,6 +14,8 @@
 
 class Engine
 {
+private:
+	bool _started = false;
 protected:
 	ImGuiIO* io;
 
@@ -36,7 +40,9 @@ public:
     void init(ImVec2 winsize, const std::string& title);
 
 	// Instance of the handlers.
-	EntityHandler entityHandler; 
+	SceneHandler sceneHandler;
+	EntityHandler globalEntityHandler; 
 	GuiHandler guiHandler;
 
+	std::function<void()> onStarted;
 };
