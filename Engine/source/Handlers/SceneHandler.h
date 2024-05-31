@@ -39,12 +39,14 @@ public:
 						active->onDisable();				
 			
 				active = pair.second;
+				activeName = pair.first;
 				active->onEnable();
 				break;
 			}
 		
 	}
 	std::shared_ptr<Scene> active;
+	std::string activeName = "";
 private:
 	std::list<std::pair<std::string, std::shared_ptr<Scene>>> scenes;
 

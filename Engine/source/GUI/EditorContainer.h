@@ -17,7 +17,7 @@ class EditorContainer : public Container
 		Settings();
 		EntityCreator();
 		EntityLister();
-		ImGui::ShowStyleEditor();
+		//ImGui::ShowStyleEditor();
 	}
 
 	void Settings()

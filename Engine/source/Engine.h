@@ -5,9 +5,10 @@
 #include "./Handlers/GuiHandler.h"
 #include "./Handlers/EntityHandler.h"
 #include "./Handlers/SceneHandler.h"
+#include "./Handlers/FontHandler.h"
+
 #include "./Utils/Conversion.h"
 #include "./Utils/Console.h"
-
 
 #include "imgui.h"
 #include "imgui-SFML.h"
@@ -16,7 +17,8 @@ class Engine
 {
 private:
 	bool started = false;
-	void configStyle();
+
+	void configureStyle();
 protected:
 	ImGuiIO* io;
 
@@ -41,6 +43,7 @@ public:
 	SceneHandler sceneHandler;
 	EntityHandler globalEntityHandler; 
 	GuiHandler guiHandler;
+	FontHandler fontHandler;
 
 	std::function<void()> onStarted;
 };
