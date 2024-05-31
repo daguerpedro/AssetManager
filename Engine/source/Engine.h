@@ -15,29 +15,27 @@
 class Engine
 {
 private:
-	bool _started = false;
+	bool started = false;
+	void configStyle();
 protected:
 	ImGuiIO* io;
 
 	Engine();
 	 ~Engine();
 
-	static Engine* _engine; // Singleton
+	static Engine* _engine;
 	
 	sf::RenderWindow window;
 public:
-	/// Its a primitive struct.
-	/// Can be pointed as a window or a RenderTexture
-	/// Window when its a release, RenderTexture when its a debug/editor.
-	sf::RenderTarget* rtarget; 
+	sf::RenderTarget* renderTarget; 
 
 	Engine(Engine& other) = delete; 
 	void operator=(const Engine&) = delete;
 
-	static Engine* GetInstance();  // Singleton access
+	static Engine* GetInstance(); 
 	static Console console;
 
-    void init(ImVec2 winsize, const std::string& title);
+    void init(bool enableEditor, ImVec2 winsize, const std::string& title);
 
 	// Instance of the handlers.
 	SceneHandler sceneHandler;

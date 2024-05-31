@@ -7,11 +7,19 @@
 class GuiHandler
 {
 public:
-	GuiHandler();
-	~GuiHandler();
+	GuiHandler() = default;
+	~GuiHandler() = default;
 
-	void pushContainer(const std::shared_ptr<Container>& container);
-	void updateGuis(const float& dt); //Tick
+	void pushContainer(const std::shared_ptr<Container>& container)
+	{
+		this->containers.emplace_back(container);
+	};
+
+	void updateGuis(const float& dt)
+	{
+		for (auto& container : containers)
+			container->onUpdate(dt);
+	};
 private:
 	std::vector<std::shared_ptr<Container>> containers;
 

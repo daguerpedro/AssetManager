@@ -21,7 +21,7 @@ void EntityHandler::postUpdate()
 		if (entity->enabled)
 		{
 			entity->postUpdate();
-			Engine::GetInstance()->rtarget->draw(*entity->drawAble);
+			Engine::GetInstance()->renderTarget->draw(*entity->drawAble);
 		}
 }
 

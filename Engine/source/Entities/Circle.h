@@ -9,7 +9,7 @@ public:
 
 	float radius = 2;
 
-	Circle(const unsigned int& layer, float col[4], unsigned int radius = 5, unsigned int sides = 5)
+	Circle(const unsigned int& layer, float col[4], float radius = 5, unsigned int sides = 5)
 		: Entity(layer), radius(radius) {
 		color[0] = col[0];
 		color[1] = col[1];
@@ -23,7 +23,8 @@ public:
 		transformable = &circle;
 	}
 
-	void OnUpdate(const int& dt) override {
+	void OnUpdate(const int& dt) override 
+	{
 
 	}
 
@@ -35,6 +36,7 @@ public:
 		color[2] = (circle.getFillColor().b/255.f);
 		color[3] = (circle.getFillColor().a/255.f);
 	};
+
 	void OnPostUpdate() override { 
 		circle.setRadius(radius);
 		circle.setFillColor(Conversion::floatToColor(color));

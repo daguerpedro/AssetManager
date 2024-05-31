@@ -16,4 +16,5 @@ public:
 			static_cast<sf::Uint8>(alpha)
 		};
 	}
+
 };

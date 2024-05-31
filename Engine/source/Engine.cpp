@@ -23,31 +23,61 @@ Engine* Engine::GetInstance()
     return _engine;
 }
 
-void Engine::init(ImVec2 winsize, const std::string& title)
+void Engine::configStyle()
 {
-#ifdef _DEBUG
-    guiHandler.pushContainer(std::make_shared<EditorContainer>());
+    auto style = &ImGui::GetStyle();
+    style->WindowPadding = { 5, 5 };
+    style->FramePadding = { 6, 5 };
+    style->SeparatorTextPadding = { 20, 3 };
+
+    style->DockingSeparatorSize = 1;
+
+    style->ItemSpacing = { 7, 5 };
+    style->ItemInnerSpacing = { 4, 4 };
+
+    style->ChildBorderSize = 0;
+    style->FrameBorderSize = 0;
+    style->PopupBorderSize = 0;
+    style->WindowBorderSize = 0;
+    style->TabBarBorderSize = 0;
+    style->TabBorderSize = 0;
+    style->SeparatorTextBorderSize = 1;
+
+    style->WindowRounding = 2;
+    style->ChildRounding = 0;
+    style->FrameRounding = 3;
+    style->TabRounding = 0;
     
-    /// When using a debug version, it wont draw things on the render window, but to a RenderTexture.
-    /// So the RenderTexture can act like a viewport.
-    auto g = std::make_shared<GameContainer>(); // Game container is just a ImGui window that draw a RenderTexture.
-    guiHandler.pushContainer(g);
-#endif
+    style->WindowTitleAlign = { .5, .5 };
+    style->SeparatorTextAlign = { .5, .5 };
+
+    style->WindowMenuButtonPosition = ImGuiDir_None;
+    style->ColorButtonPosition = ImGuiDir_Left;
+
+
+}
+
+void Engine::init(bool enableEditor, ImVec2 winsize, const std::string& title)
+{
     window.create(sf::VideoMode(winsize.x, winsize.y), title);
     ImGui::SFML::Init(window);
 
     io = &ImGui::GetIO();
     io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    configStyle();
 
     sf::Clock c_sfml;
     sf::Clock c_time;
 
-#ifdef _DEBUG
-    rtarget = &g->rt; //If using a debug version, the render target will be a ImGui Window.
-#endif
-#ifdef _NDEBUG
-    rtarget = &window; //If not a debug version, just use the RenderWindow.
-#endif
+    renderTarget = &window;
+
+    if (enableEditor)
+    {
+        guiHandler.pushContainer(std::make_shared<EditorContainer>());
+        auto gameContainer = std::make_shared<GameContainer>(); // Game container is just a ImGui window that draw a RenderTexture.
+        guiHandler.pushContainer(gameContainer);
+        renderTarget = &gameContainer->rt;
+    }
 
     while (window.isOpen())
     {
@@ -63,41 +93,36 @@ void Engine::init(ImVec2 winsize, const std::string& title)
 
         ImGui::SFML::Update(window, c_sfml.restart());
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()->ID, 0, ImGuiDockNodeFlags_PassthruCentralNode);
-        
+
         window.clear();
 
-        if (rtarget != nullptr)
-        {
-            //TODO: Make a color conversion function.
-            //Clear the render using a color setted via Config.
-            rtarget->clear(Conversion::floatToColor(Config::color_bg));
-        }
+        if (renderTarget != nullptr)
+            renderTarget->clear(Conversion::floatToColor(Config::color_bg));
 
         //tick
 
         globalEntityHandler.preUpdate();
         sceneHandler.preUpdateScene();
 
-        guiHandler.updateGuis(dt);
+        guiHandler.updateGuis(dt); //Gui doesnt need preUpdates nor postUpdates.
         globalEntityHandler.updateEntities(dt);
         sceneHandler.updateScene(dt);
 
         globalEntityHandler.postUpdate();
         sceneHandler.postUpdateScene();
 
-#ifdef _DEBUG
-        console.draw();
-#endif // _DEBUG
+        if (enableEditor)
+            console.draw();
 
         ImGui::SFML::Render(window);
         window.display();
 
-        if (!_started)
+        if (!started)
         {
             if (onStarted)
                 onStarted();
-            
-            _started = true;
+
+            started = true;
         }
     }
 

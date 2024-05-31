@@ -8,7 +8,7 @@ class SceneHandler
 {
 public:
 	~SceneHandler() = default;
-	SceneHandler() { };
+	SceneHandler() = default;
 
 	inline void pushScene(const std::string& name, const std::shared_ptr<Scene>& scene) 
 	{
@@ -44,8 +44,8 @@ public:
 			}
 		
 	}
+	std::shared_ptr<Scene> active;
 private:
 	std::list<std::pair<std::string, std::shared_ptr<Scene>>> scenes;
-	std::shared_ptr<Scene> active;
 
 };

@@ -4,6 +4,7 @@ class Scene
 {
 public:
     EntityHandler sceneEntityHandler;
+
     virtual void onEnable() = 0;
     virtual void onDisable() = 0;
 

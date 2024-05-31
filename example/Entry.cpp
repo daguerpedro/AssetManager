@@ -2,48 +2,49 @@
 #include <windows.h>
 
 #include "..\Engine\source\Engine.h"
-#include <Entities/Circle.h>
+#include <Entities/Text.h>
 #include <thread>
 
 class Test : public Scene
 {
-    std::shared_ptr<Circle> c;
-    float acc = 0;
-    float speed = 25;
+    std::shared_ptr<Text> eta;
+    sf::Font font;
 public:
     Test()
     {
-        c = std::make_shared<Circle>(0, new float[] {0, 0, 1, 1}, 65, 30);
-        this->sceneEntityHandler.pushEntity(c);
+        if (!font.loadFromFile("./arial.ttf"))
+        {
+            Engine::console.log("Failed to load arial.ttf");
+        }
+
+        eta = std::make_shared<Text>(0, "Title", font, 35);
+        eta->primitive.setFillColor(sf::Color::Black);
+
+        this->sceneEntityHandler.pushEntity(eta);
     };
 
     void onEnable() override
     {
-        Engine::console.log("Test enabled");
-        c->position[0] = Engine::GetInstance()->rtarget->getView().getSize().x / 2;
-        c->position[1] = Engine::GetInstance()->rtarget->getView().getSize().y / 2;
-
+        Engine::console.log("Test enabled");       
     };
+
     void onDisable() override
     {
         Engine::console.log("Test disabled");
     };
+
     void onUpdate(const float& dt) override
     {
-        acc += 1 * dt;
-        c->position[0] += speed * dt;
-        if (acc >= 5)
-        {
-            acc = 0;
-            c->position[0] = Engine::GetInstance()->rtarget->getView().getSize().x / 2;
-            c->position[1] = Engine::GetInstance()->rtarget->getView().getSize().y / 2;
-        }
+
     };
+
     void onPreUpdate() override
     {
     };
+
     void onPostUpdate() override
     {
+
     };
 };
 
@@ -61,6 +62,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
         std::thread scenest = std::thread(OThread);
         scenest.detach();
     };
-    engine->init({ 650, 500 }, "Engine");
+    engine->init(true, { 650, 500 }, "Engine");
     return 0;
 }
