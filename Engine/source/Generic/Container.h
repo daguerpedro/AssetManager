@@ -6,7 +6,7 @@
 class Container
 {
 public:
-	virtual void onUpdate(const int& dt) {
+	virtual void onUpdate(const float& dt) {
 		ImGui::Begin("Container", nullptr);
 		ImGui::End();
 	};

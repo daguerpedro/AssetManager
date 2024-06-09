@@ -1,162 +1,103 @@
 #pragma once
 #include "..\Generic\Container.h"
 
-#include "Config.h"
+#include "..\..\etc\imgui\imgui_stdlib.h"
+
 #include <Engine.h>
 #include <Entities/Circle.h>
+#include <Entities/Text.h>
 
 class EditorContainer : public Container 
 {
-	float col[4] = { 1, 0, 0, 1 };
-	float rad = 5;
-	int sid = 5;
-	char buff[255]{0};
+	std::shared_ptr<Entity> selected;
 
-	void onUpdate(const int& dt) override
+	static int resizeCallback(ImGuiInputTextCallbackData* data)
+	{
+		if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+		{
+			ImVector<char>* my_str = (ImVector<char>*)data->UserData;
+			IM_ASSERT(my_str->begin() == data->Buf);
+			my_str->resize(data->BufSize);
+			data->Buf = my_str->begin();
+
+			Engine::GetInstance()->console.log("resizeCallback");
+		}
+		return 0;
+	};
+
+	void onUpdate(const float& dt) override
 	{		
-		Settings();
-		EntityCreator();
-		EntityLister();
-		//ImGui::ShowStyleEditor();
+		ShowSceneDetails();
 	}
 
-	void Settings()
+	void ShowSceneDetails()
 	{
-		ImGui::Begin("Settings", nullptr);		
-			ImGui::ColorEdit4("Background", Config::color_bg, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_NoInputs);
-		ImGui::End();
-	};
+		ImGui::Begin("Scene");
+		auto handler = Engine::GetInstance()->sceneHandler;
+		auto scene = handler.active;
 
-	void EntityLister()
-	{
-		ImGui::Begin("Entites");
+		if (scene != nullptr)
+		{			
+			ImGui::SeparatorText("Info");
+			ImGui::Text("%s Scene.", handler.activeName.c_str());
+			ImGui::ColorEdit4("Back ground", scene->backColor, ImGuiColorEditFlags_NoInputs);
 
-		for (auto e : Engine::GetInstance()->globalEntityHandler.entities)
-			DisplayEntity(e);
+			ImGui::SeparatorText("Entities");
+			if (ImGui::BeginListBox("##Entities", ImVec2(-FLT_MIN, (scene->sceneEntityHandler.entities.size() + 1) * ImGui::GetTextLineHeightWithSpacing())))
+			{
+				for (auto e : scene->sceneEntityHandler.entities)
+				{
+					const bool is_selected = (selected == e);
+					if (ImGui::Selectable(e->name.c_str(), is_selected))
+						selected = e;
 
-		if (Engine::GetInstance()->sceneHandler.active != nullptr)
-		for (auto e : Engine::GetInstance()->sceneHandler.active->sceneEntityHandler.entities)
-			DisplayEntity(e);
+					if (is_selected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndListBox();
 
-		ImGui::End();
-	};
-
-	void DisplayEntity(std::shared_ptr<Entity> e)
-	{
-		auto ents = Engine::GetInstance()->globalEntityHandler.entities;
-		int i = std::distance(ents.begin(), std::find(ents.begin(), ents.end(), e));
-
-		//TODO: CHECK TYPE
-		ImGui::SeparatorText("Orientation");
-
-		ImGui::Text("Position"); ImGui::SameLine();
-		ImGui::InputFloat2(("##P" + std::to_string(i)).c_str(), e->position, "%.f");
-
-		ImGui::Text("Rotation"); ImGui::SameLine();
-		ImGui::InputFloat(("##Rt" + std::to_string(i)).c_str(), &e->rotation);
-
-		ImGui::Text("Scale"); ImGui::SameLine();
-		ImGui::InputFloat2(("##S" + std::to_string(i)).c_str(), e->scale);
-
-		ImGui::SeparatorText("Visual");
-
-		ImGui::Text("Layer: %i", e->getLayer());
-		ImGui::InputInt(("##L" + std::to_string(i)).c_str(), &e->Layer);
-
-		if (std::shared_ptr<Circle> circle = dynamic_pointer_cast<Circle>(e))
-		{
-			ImGui::Text("Radius"); ImGui::SameLine();
-			ImGui::InputFloat(("##Rd" + std::to_string(i)).c_str(), &circle->radius);
-
-			ImGui::Text("Color"); ImGui::SameLine();
-			ImGui::ColorEdit4(("##Clr" + std::to_string(i)).c_str(), circle->color);
+				if (selected == nullptr && scene->sceneEntityHandler.entities.size() > 0)
+					selected = scene->sceneEntityHandler.entities[0];
+			}
 		}
+		ImGui::End();
 
-		ImGui::SeparatorText("Other");
+		ImGui::Begin("Entity");
 
-		if (ImGui::Button(("Delete##" + std::to_string(i)).c_str()))
+		if (scene != nullptr && selected != nullptr)
 		{
-			Engine::GetInstance()->sceneHandler.active->sceneEntityHandler.remove(e);
-			Engine::GetInstance()->globalEntityHandler.remove(e);
-		}
+			ImGui::Text("%s", selected->name.c_str());
 
-		ImGui::Separator();
+			ImGui::Checkbox("Enabled", &selected->enabled);
+
+			ImGui::InputInt("Layer", &selected->Layer, 1, 1);
+			if (selected->Layer < 0)
+				selected->Layer = 0;
+
+			//todo: align
+			ImGui::InputFloat2("Position", selected->position, "%.f");
+
+			ImGui::InputFloat2("Scale", selected->scale, "%.f");
+
+			ImGui::InputFloat("Rotation", &selected->rotation, 1, 1, "%.f");
+
+			switch (selected->type)
+			{
+			case TEXT:
+			{
+
+				auto text = std::dynamic_pointer_cast<Text>(selected);
+				ImGui::ColorEdit4("Color", text->color,ImGuiColorEditFlags_NoInputs);
+
+				ImGui::InputText("Text", &text->text, ImGuiInputTextFlags_None, resizeCallback);
+				ImGui::InputInt("Character Size", &text->charSize, 1, 1);
+				break;
+			}
+			default:
+				break;
+			}
+
+		}
+		ImGui::End();
 	}
-
-	void EntityCreator()
-	{
-		ImGui::Begin("Entity Creator");
-		if (ImGui::TreeNode("Entity Creator"))
-		{
-			const char* items_type[] = { "Circle", "Text" };
-			static int index_type = 0;
-
-			const char* preview_type = items_type[index_type];
-
-			if (ImGui::BeginCombo("Type", preview_type))
-			{
-				for (int n = 0; n < IM_ARRAYSIZE(items_type); n++)
-				{
-					const bool selected_type = (index_type == n);
-					if (ImGui::Selectable(items_type[n], selected_type))
-						index_type = n;
-
-					if (selected_type)
-						ImGui::SetItemDefaultFocus();
-				}
-				ImGui::EndCombo();
-			}
-
-			const char* items_loc[] = { "Global", "Scene" };
-			static int index_loc = 0;
-
-			const char* preview_loc = items_loc[index_loc];
-
-			if (ImGui::BeginCombo("Location", preview_loc))
-			{
-				for (int n = 0; n < IM_ARRAYSIZE(items_loc); n++)
-				{
-					const bool selected_loc = (index_loc == n);
-					if (ImGui::Selectable(items_loc[n], selected_loc))
-						index_loc = n;
-
-					if (selected_loc)
-						ImGui::SetItemDefaultFocus();
-				}
-				ImGui::EndCombo();
-			}
-
-			if (index_type == 0)
-			{
-				ImGui::ColorEdit4("Color", col);
-				ImGui::InputInt("Sides", &sid, 1, 1);
-				ImGui::InputFloat("Radius", &rad, 1, 1);
-			}
-			if (index_type == 1)
-			{
-				ImGui::InputText("Text", buff, IM_ARRAYSIZE(buff));
-			}
-			if (sid <= 2) sid = 3;
-
-			if (ImGui::Button("Create"))
-			{
-				EntityHandler* handler = &Engine::GetInstance()->globalEntityHandler;
-				if (index_loc == 1)
-					handler = &Engine::GetInstance()->sceneHandler.active->sceneEntityHandler;
-
-				if (index_type == 0)
-					handler->pushEntity(std::make_shared<Circle>(1, col, rad, sid));
-
-				std::string text = "Criado entity do tipo ";
-				text += items_type[index_type];
-				text += " em ";
-				text += items_loc[index_loc];
-
-				Engine::console.log(text);
-			}
-			ImGui::TreePop();
-		}
-		ImGui::End();
-	};
-
 };

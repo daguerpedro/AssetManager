@@ -2,21 +2,26 @@
 
 #include <SFML/Graphics.hpp>
 
+enum EntityType	{CIRCLE, TEXT};
+
 class Entity {
 protected:
 	unsigned int _layer;
 
 public:
-	inline Entity(const unsigned int& layer) 
+	EntityType type;
+
+	inline Entity(const unsigned int& layer, const std::string& name) 
 	{
 		_layer = layer;
+		Layer = _layer;
 		enabled = true;
+		this->name = name;
 	}
 	
-	inline ~Entity()
-	{
+	inline ~Entity(){}
 
-	}
+	std::string name;
 
 	sf::Drawable* drawAble = nullptr;
 	sf::Transformable* transformable = nullptr;
@@ -24,7 +29,6 @@ public:
 	virtual void OnUpdate(const int& dt) = 0;
 	virtual void onPreUpdate() = 0;
 	virtual void OnPostUpdate() = 0;
-
 
 	void preUpdate(); //Pre-update will get values from transformable and dump in Entity variables.
 	//Between preUpdate and Update, the GUI should bge rendered.

@@ -1,6 +1,5 @@
 #pragma once
 #include "..\Generic\Container.h"
-#include "Config.h"
 
 #include <Engine.h>
 
@@ -13,10 +12,9 @@ public:
 	{
 		rt.create(0, 0);
 	}
-	void onUpdate(const int& dt) override
+	void onUpdate(const float& dt) override
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
-
 		ImGui::Begin("Game view", nullptr);
 			
 		ImVec2 size = ImGui::GetContentRegionAvail();
@@ -26,11 +24,16 @@ public:
 			lastSize = newSize;
 		}
 
-			rt.clear(Conversion::floatToColor(Config::color_bg));
-			
-			Engine::GetInstance()->globalEntityHandler.updateEntities(dt);
+		sf::Color c= sf::Color::Black;
 
-			ImGui::Image(rt);
+		if (Engine::GetInstance()->sceneHandler.active != nullptr)
+			c = Conversion::floatToColor(Engine::GetInstance()->sceneHandler.active->backColor);
+
+		rt.clear(c);
+			
+
+		ImGui::Image(rt);
+
 		ImGui::End();
 		ImGui::PopStyleVar();		
 	}

@@ -28,4 +28,5 @@ public:
         sceneEntityHandler.postUpdate();
     };
 
+    float backColor[4] = { 0,0,0,1 };
 };

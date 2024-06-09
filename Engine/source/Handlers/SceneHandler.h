@@ -1,8 +1,9 @@
 #pragma once
-#include "../Generic/Scene.h"
 
-#include <list>
+#include "..\Generic\Scene.h"
+
 #include <memory>
+#include <list>
 
 class SceneHandler
 {
@@ -18,33 +19,22 @@ public:
 	{
 		if (active != nullptr)
 			active->preUpdate();
-	}
+	};
+
 	inline void updateScene(const float& dt)
 	{
 		if (active != nullptr)
 			active->update(dt);
-	}
+	};
+
 	inline void postUpdateScene()
 	{
 		if (active != nullptr)
 			active->postUpdate();
-	}
-	inline void setActive(const std::string& name)
-	{
-		for (auto& pair : scenes) 		
-			if (pair.first == name) 
-			{
-				if (active != nullptr)
-					if (active != pair.second)					
-						active->onDisable();				
-			
-				active = pair.second;
-				activeName = pair.first;
-				active->onEnable();
-				break;
-			}
-		
-	}
+	};
+
+	void setActive(const std::string& name);
+
 	std::shared_ptr<Scene> active;
 	std::string activeName = "";
 private:

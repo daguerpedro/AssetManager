@@ -1,4 +1,5 @@
 #include "EntityHandler.h"
+
 #include <algorithm>
 #include <Engine.h>
 
@@ -34,7 +35,7 @@ void EntityHandler::pushEntity(const std::shared_ptr<Entity>& entity)
 void EntityHandler::sort()
 {
 	std::sort(entities.begin(), entities.end(), [](const std::shared_ptr<Entity>& a, const std::shared_ptr<Entity>& b) {
-		return a->getLayer() < b->getLayer();
+		return a->getLayer() > b->getLayer();
 	});
 }
 

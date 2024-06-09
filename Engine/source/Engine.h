@@ -13,6 +13,7 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 
+	
 class Engine
 {
 private:
@@ -23,25 +24,24 @@ protected:
 	ImGuiIO* io;
 
 	Engine();
-	 ~Engine();
+	~Engine();
 
 	static Engine* _engine;
-	
+
 	sf::RenderWindow window;
 public:
-	sf::RenderTarget* renderTarget; 
+	sf::RenderTarget* renderTarget;
 
-	Engine(Engine& other) = delete; 
+	Engine(Engine& other) = delete;
 	void operator=(const Engine&) = delete;
 
-	static Engine* GetInstance(); 
+	static Engine* GetInstance();
 	static Console console;
 
-    void init(bool enableEditor, ImVec2 winsize, const std::string& title);
+	void init(bool enableEditor, ImVec2 winsize, const std::string& title);
 
 	// Instance of the handlers.
 	SceneHandler sceneHandler;
-	EntityHandler globalEntityHandler; 
 	GuiHandler guiHandler;
 	FontHandler fontHandler;
 

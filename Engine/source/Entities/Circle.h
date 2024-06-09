@@ -9,8 +9,8 @@ public:
 
 	float radius = 2;
 
-	Circle(const unsigned int& layer, float col[4], float radius = 5, unsigned int sides = 5)
-		: Entity(layer), radius(radius) {
+	Circle(const unsigned int& layer, const std::string& name, float col[4], float radius = 5, unsigned int sides = 5)
+		: Entity(layer, name), radius(radius) {
 		color[0] = col[0];
 		color[1] = col[1];
 		color[2] = col[2];
@@ -21,6 +21,8 @@ public:
 		circle.setOrigin(circle.getLocalBounds().width / 2, circle.getLocalBounds().height / 2);
 		drawAble = &circle;
 		transformable = &circle;
+
+		type = CIRCLE;
 	}
 
 	void OnUpdate(const int& dt) override 

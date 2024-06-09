@@ -3,7 +3,7 @@
 
 class Conversion {
 public:
-	inline static sf::Color floatToColor(float _col[])
+	inline static sf::Color floatToColor(const float _col[])
 	{
 		int vals = (sizeof(_col) / sizeof(_col[0]));
 

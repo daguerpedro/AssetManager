@@ -132,19 +132,22 @@ void Engine::init(bool enableEditor, ImVec2 winsize, const std::string& title)
 
         window.clear();
 
+		sf::Color c= sf::Color::Black;
         if (renderTarget != nullptr)
-            renderTarget->clear(Conversion::floatToColor(Config::color_bg));
+        {
+            if (Engine::GetInstance()->sceneHandler.active != nullptr)
+                c = Conversion::floatToColor(Engine::GetInstance()->sceneHandler.active->backColor);
+
+            renderTarget->clear(c);
+        }
 
         //tick
 
-        globalEntityHandler.preUpdate();
         sceneHandler.preUpdateScene();
 
         guiHandler.updateGuis(dt); //Gui doesnt need preUpdates nor postUpdates.
-        globalEntityHandler.updateEntities(dt);
         sceneHandler.updateScene(dt);
 
-        globalEntityHandler.postUpdate();
         sceneHandler.postUpdateScene();
 
         if (enableEditor)
